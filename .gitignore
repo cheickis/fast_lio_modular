@@ -1,8 +1,38 @@
-build
-Log/*.png
-Log/*.txt
-Log/*.csv
-Log/*.pdf
+# Build artifacts
+build/
+install/
+log/
+Log/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
 .vscode/c_cpp_properties.json
 .vscode/settings.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# ROS2
+*.bag
+*.db3
+
+# Compiled
+*.o
+*.so
+*.a
+
+# Logs
+*.log
+
+# Test coverage
+coverage/
+*.gcov
+*.gcda
+*.gcno
+
+#Point Cloud File
 PCD/*.pcd
