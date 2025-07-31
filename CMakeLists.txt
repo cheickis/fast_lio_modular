@@ -125,4 +125,34 @@ install(
   DESTINATION share/${PROJECT_NAME}
 )
 
+
+# ---------------- Testing --------------- #
+if(BUILD_TESTING)
+  find_package(ament_cmake_gtest REQUIRED)
+  
+  # Create the test executable
+  ament_add_gtest(test_config 
+    test/test_config.cpp
+  )
+  
+  # Add include directories BEFORE linking
+  target_include_directories(test_config PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+     ${CMAKE_CURRENT_SOURCE_DIR}/include/config
+    ${PCL_INCLUDE_DIRS}
+    ${EIGEN3_INCLUDE_DIR}
+  )
+  
+  # Link libraries
+  target_link_libraries(test_config
+    ${PCL_LIBRARIES}
+    Eigen3::Eigen
+  )
+  
+  # Add ROS dependencies
+  ament_target_dependencies(test_config
+    rclcpp
+  )
+endif()
+
 ament_package()
