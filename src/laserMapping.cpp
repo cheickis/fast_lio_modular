@@ -44,6 +44,8 @@
 #include <so3_math.h>
 #include <rclcpp/rclcpp.hpp>
 #include <Eigen/Core>
+#include <Eigen/Dense>
+
 #include "IMU_Processing.hpp"
 #include <nav_msgs/msg/odometry.hpp>
 #include <nav_msgs/msg/path.hpp>
@@ -70,6 +72,9 @@ namespace fast_lio
 {
     Config g_config; // Global config instance for migration bridge
 }
+
+using namespace Eigen;
+using namespace std;
 using namespace fast_lio;
 
 #define INIT_TIME (0.1)
@@ -195,7 +200,7 @@ void pointBodyToWorld(PointType const *const pi, PointType *const po)
 }
 
 template <typename T>
-void pointBodyToWorld(const Matrix<T, 3, 1> &pi, Matrix<T, 3, 1> &po)
+void pointBodyToWorld(const Eigen::Matrix<T, 3, 1> &pi, Eigen::Matrix<T, 3, 1> &po)
 {
     V3D p_body(pi[0], pi[1], pi[2]);
     V3D p_global(state_point.rot * (state_point.offset_R_L_I * p_body + state_point.offset_T_L_I) + state_point.pos);
@@ -214,6 +219,16 @@ void RGBpointBodyToWorld(PointType const *const pi, PointType *const po)
     po->y = p_global(1);
     po->z = p_global(2);
     po->intensity = pi->intensity;
+}
+
+void pointBodyToWorld(const V3F &pi, V3F &po)
+{
+    V3D p_body(pi[0], pi[1], pi[2]);
+    V3D p_global(state_point.rot * (state_point.offset_R_L_I * p_body + state_point.offset_T_L_I) + state_point.pos);
+
+    po[0] = p_global(0);
+    po[1] = p_global(1);
+    po[2] = p_global(2);
 }
 
 void RGBpointBodyLidarToIMU(PointType const *const pi, PointType *const po)
@@ -734,7 +749,7 @@ void h_share_model(state_ikfom &s, esekfom::dyn_share_datastruct<double> &ekfom_
         VF(4)
         pabcd;
         point_selected_surf[i] = false;
-        if (esti_plane(pabcd, points_near, 0.1f))
+        if (fast_lio::geometry::estiPlane(pabcd, points_near, 0.1f))
         {
             float pd2 = pabcd(0) * point_world.x + pabcd(1) * point_world.y + pabcd(2) * point_world.z + pabcd(3);
             float s = 1 - 0.9 * fabs(pd2) / sqrt(p_body.norm());
